@@ -5,7 +5,6 @@
     </div>
   </div>
 </template>
-
 <script>
   import get from 'lodash/get'
 
@@ -23,15 +22,14 @@
         required: true
       }
     },
-    data() {
+    data () {
       return {
         content_width: 0
       }
     },
     computed: {
-      cls() {
-        switch (get(this.col, 'type', 'text'))
-        {
+      cls () {
+        switch (get(this.col, 'type', 'text')) {
           case 'bool':
           case 'boolean':
           case 'date':
@@ -47,7 +45,7 @@
         return ''
       }
     },
-    mounted() {
+    mounted () {
       this.content_width = el ? el.offsetWidth : 0
       this.$emit('determine-auto-width', this.col, this.content_width)
     }

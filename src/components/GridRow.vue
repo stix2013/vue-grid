@@ -43,17 +43,17 @@
       GridCell
     },
     computed: {
-      row_style() {
+      row_style () {
         return {
-          'top': (this.rowIndex*this.rowHeight)+'px'
+          'top': (this.rowIndex * this.rowHeight) + 'px'
         }
       }
     },
     methods: {
-      getColumnName(col) {
+      getColumnName (col) {
         return get(col, 'name', '')
       },
-      onCellDetermineWidth(col, width) {
+      onCellDetermineWidth (col, width) {
         this.$emit('determine-cell-auto-width', this.rowIndex, col, width)
       }
     }

@@ -29,27 +29,27 @@
         default: DEFAULT_ROW_HEIGHT
       }
     },
-    data() {
+    data () {
       return {
         column_resize_handle_width: COLUMN_RESIZE_HANDLE_WIDTH
       }
     },
     computed: {
-      row_handle_style() {
+      row_handle_style () {
         return {
-          'height': (this.rowHeight+1)+'px'
+          'height': (this.rowHeight + 1) + 'px'
         }
       },
-      inner_row_handle_style() {
+      inner_row_handle_style () {
         return {
-          'width': this.rowHandleWidth+'px'
+          'width': this.rowHandleWidth + 'px'
         }
       }
     },
     methods: {
-      onRowHandleResizerMousedown() {
+      onRowHandleResizerMousedown () {
         this.$emit('start-row-handle-resize')
-      },
+      }
     }
   }
 </script>

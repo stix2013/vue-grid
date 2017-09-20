@@ -36,13 +36,13 @@
       GridHeaderCell
     },
     methods: {
-      getColumnName(col) {
+      getColumnName (col) {
         return get(col, 'name', '')
       },
-      onColumnResizerMousedown(col) {
+      onColumnResizerMousedown (col) {
         this.$emit('start-column-resize', col)
       },
-      onHeaderCellDetermineWidth(col, width) {
+      onHeaderCellDetermineWidth (col, width) {
         this.$emit('determine-cell-auto-width', 'header', col, width)
       }
     }

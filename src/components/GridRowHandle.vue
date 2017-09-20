@@ -26,15 +26,15 @@
       }
     },
     computed: {
-      row_style() {
+      row_style () {
         return {
-          'top': (this.rowIndex*this.rowHeight)+'px',
-          'height': (this.rowHeight+1)+'px'
+          'top': (this.rowIndex * this.rowHeight) + 'px',
+          'height': (this.rowHeight + 1) + 'px'
         }
       },
-      inner_row_handle_style() {
+      inner_row_handle_style () {
         return {
-          'width': this.rowHandleWidth+'px'
+          'width': this.rowHandleWidth + 'px'
         }
       }
     }

@@ -33,19 +33,19 @@
         required: true
       }
     },
-    data() {
+    data () {
       return {
         content_width: 0,
         column_resize_handle_width: COLUMN_RESIZE_HANDLE_WIDTH
       }
     },
-    mounted() {
+    mounted () {
       const el = this.$refs.content
       this.content_width = el ? el.offsetWidth : 0
       this.$emit('determine-auto-width', this.col, this.content_width)
     },
     methods: {
-      onColumnResizerMousedown() {
+      onColumnResizerMousedown () {
         this.$emit('column-resizer-mousedown', this.col)
       }
     }
