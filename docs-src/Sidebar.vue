@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="lh-copy f6 ma3">{{description}}.</div>
-    <div class="lh-copy f6 ma3">Created by: <a href="https://www.twitter.com/padredaveo" class="blue">David Z. Williams</a></div>
     <div class="bb b--black-20 mh3 mb3"></div>
     <a
       class="flex flex-row items-center no-underline truncate link f5 fw6 pa3 sidebar-link"
