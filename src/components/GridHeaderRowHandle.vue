@@ -1,11 +1,11 @@
 <template>
-  <div class="overflow-hidden ba absolute bg-near-white z-1 vg-th" :style="row_handle_style">
-    <div class="h-100 lh-1 light-silver tr vg-th-inner" :style="inner_row_handle_style"></div>
+  <div class="overflow-hidden ba absolute bg-near-white z-1 vg-th" :style="rowHandleStyle">
+    <div class="h-100 lh-1 light-silver tr vg-th-inner" :style="innerRowHandleStyle"></div>
 
     <!-- row handle resize handle -->
     <div
       class="absolute top-0 bottom-0 right-0 cursor-resize-ew"
-      :style="'width: '+column_resize_handle_width+'px'"
+      :style="'width: '+columnResizeHandleWidth+'px'"
       @mousedown="onRowHandleResizerMousedown"
     ></div>
   </div>
@@ -31,16 +31,16 @@
     },
     data () {
       return {
-        column_resize_handle_width: COLUMN_RESIZE_HANDLE_WIDTH
+        columnResizeHandleWidth: COLUMN_RESIZE_HANDLE_WIDTH
       }
     },
     computed: {
-      row_handle_style () {
+      rowHandleStyle () {
         return {
           'height': (this.rowHeight + 1) + 'px'
         }
       },
-      inner_row_handle_style () {
+      innerRowHandleStyle () {
         return {
           'width': this.rowHandleWidth + 'px'
         }

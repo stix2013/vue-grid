@@ -1,6 +1,6 @@
 <template>
-  <div class="absolute nowrap" :style="row_style">
-    <div class="h-100 lh-1 light-silver tr vg-td-inner" :style="inner_row_handle_style">{{rowIndex+1}}</div>
+  <div class="absolute nowrap" :style="rowStyle">
+    <div class="h-100 lh-1 light-silver tr vg-td-inner" :style="innerRowHandleStyle">{{rowIndex+1}}</div>
   </div>
 </template>
 
@@ -26,13 +26,13 @@
       }
     },
     computed: {
-      row_style () {
+      rowStyle () {
         return {
           'top': (this.rowIndex * this.rowHeight) + 'px',
           'height': (this.rowHeight + 1) + 'px'
         }
       },
-      inner_row_handle_style () {
+      innerRowHandleStyle () {
         return {
           'width': this.rowHandleWidth + 'px'
         }

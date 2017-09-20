@@ -8,7 +8,7 @@
     <!-- column resize handle -->
     <div
       class="absolute top-0 bottom-0 right-0 cursor-resize-ew"
-      :style="'width: '+column_resize_handle_width+'px'"
+      :style="'width: '+columnResizeHandleWidth+'px'"
       @mousedown="onColumnResizerMousedown"
     ></div>
   </div>
@@ -35,14 +35,14 @@
     },
     data () {
       return {
-        content_width: 0,
-        column_resize_handle_width: COLUMN_RESIZE_HANDLE_WIDTH
+        contentWidth: 0,
+        columnResizeHandleWidth: COLUMN_RESIZE_HANDLE_WIDTH
       }
     },
     mounted () {
       const el = this.$refs.content
-      this.content_width = el ? el.offsetWidth : 0
-      this.$emit('determine-auto-width', this.col, this.content_width)
+      this.contentWidth = el ? el.offsetWidth : 0
+      this.$emit('determine-auto-width', this.col, this.contentWidth)
     },
     methods: {
       onColumnResizerMousedown () {

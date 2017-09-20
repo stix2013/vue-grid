@@ -24,7 +24,7 @@
     },
     data () {
       return {
-        content_width: 0
+        contentWidth: 0
       }
     },
     computed: {
@@ -47,8 +47,8 @@
     },
     mounted () {
       const el = this.$refs.content
-      this.content_width = el ? el.offsetWidth : 0
-      this.$emit('determine-auto-width', this.col, this.content_width)
+      this.contentWidth = el ? el.offsetWidth : 0
+      this.$emit('determine-auto-width', this.col, this.contentWidth)
     }
   }
 </script>

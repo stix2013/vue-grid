@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute nowrap" :style="row_style">
+  <div class="absolute nowrap" :style="rowStyle">
     <grid-cell
       class="dib v-top overflow-hidden ba vg-td"
       v-for="(col, index) in columns"
@@ -43,7 +43,7 @@
       GridCell
     },
     computed: {
-      row_style () {
+      rowStyle () {
         return {
           'top': (this.rowIndex * this.rowHeight) + 'px'
         }

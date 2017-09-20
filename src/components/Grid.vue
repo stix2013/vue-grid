@@ -30,7 +30,7 @@
       <!-- row handles -->
       <div class="absolute z-1" :style="'top: '+(rowHeight-scrollTop)+'px'">
         <grid-row-handle
-          v-for="(row, index) in render_rows"
+          v-for="(row, index) in renderRows"
           class="ba bg-near-white vg-td"
           :key="index"
           :row-index="start+index"
@@ -53,7 +53,7 @@
 
         <!-- rows -->
         <grid-row
-          v-for="(row, index) in render_rows"
+          v-for="(row, index) in renderRows"
           :key="index"
           :row="row"
           :row-index="start+index"
@@ -79,7 +79,6 @@
     COLUMN_MIN_WIDTH,
     COLUMN_MAX_WIDTH
   } from '../constants'
-  // import _ from 'lodash'
   import uniqueId from 'lodash/uniqueId'
   import size from 'lodash/size'
   import first from 'lodash/first'
@@ -122,21 +121,21 @@
   export default {
     name: 'vue-grid',
     props: {
-      'data-url': {
+      dataUrl: {
         type: String,
         default: ''
       },
-      'custom-headers': {
+      customHeaders: {
         type: Object,
         default: () => { return {} }
       },
       /* show empty cells on vertical scroll */
-      'live-scroll': {
+      liveScroll: {
         type: Boolean,
         default: false
       },
       /* remove off-screen cells from the DOM on horizontal scroll */
-      'virtual-scroll': {
+      virtualScroll: {
         type: Boolean,
         default: true
       }
@@ -161,31 +160,31 @@
       totalHeight (val, oldVal) {
         this.$emit('total-height-change', val, oldVal)
       },
-      rendered_row_count (val, oldVal) {
+      renderedRowCount (val, oldVal) {
         this.$emit('rendered-row-count-change', val, oldVal)
       },
-      cached_row_count (val, oldVal) {
+      cachedRowCount (val, oldVal) {
         this.$emit('cached-row-count-change', val, oldVal)
       },
       totalRowCount (val, oldVal) {
         this.$emit('total-row-count-change', val, oldVal)
       },
-      first_visible_row (val, oldVal) {
+      firstVisibleRow (val, oldVal) {
         this.$emit('first-visible-row-change', val, oldVal)
       },
-      last_visible_row (val, oldVal) {
+      lastVisibleRow (val, oldVal) {
         this.$emit('last-visible-row-change', val, oldVal)
       },
-      visible_row_count (val, oldVal) {
+      visibleRowCount (val, oldVal) {
         this.$emit('visible-row-count-change', val, oldVal)
       },
-      first_visible_column (val, oldVal) {
+      firstVisibleColumn (val, oldVal) {
         this.$emit('first-visible-column-change', val, oldVal)
       },
-      last_visible_column (val, oldVal) {
+      lastVisibleColumn (val, oldVal) {
         this.$emit('last-visible-column-change', val, oldVal)
       },
-      visible_column_count (val, oldVal) {
+      visibleColumnCount (val, oldVal) {
         this.$emit('visible-column-count-change', val, oldVal)
       },
       metrics (val, oldVal) {
@@ -194,19 +193,18 @@
     },
     data () {
       return {
-        // uid: _.uniqueId('vue-grid-'),
         uid: uniqueId('vue-grid-'),
 
         initialized: false,
-        col_widths_initialized: false,
+        colWidthsInitialized: false,
 
         start: DEFAULT_START, // initial start
         limit: DEFAULT_LIMIT, // initial limit
         totalRowCount: 0, // returned by query
 
         columns: [],
-        resize_col: null,
-        resize_row_handle: null,
+        resizeCol: null,
+        resizeRowHandle: null,
 
         rows: [],
         cachedRows: {},
@@ -216,8 +214,8 @@
         clientHeight: 0,
         clientWidth: 0,
 
-        container_offset_top: 0,
-        container_offset_left: 0,
+        containerOffsetTop: 0,
+        containerOffsetLeft: 0,
 
         offsetTop: 0,
         offsetLeft: 0,
@@ -227,12 +225,12 @@
         scrollTop: 0,
         scrollLeft: 0,
 
-        mousedown_x: -1,
-        mousedown_y: -1,
+        mousedownX: -1,
+        mousedownY: -1,
         mouseX: 0,
         mouseY: 0,
 
-        is_horizontal_scroll_active: false
+        isHorizontalScrollActive: false
       }
     },
     computed: {
@@ -242,25 +240,25 @@
       totalWidth () {
         return this.columns.map(column => column.pixelWidth).reduce((acc, width) => acc + width, 0)
       },
-      rendered_row_count () {
+      renderedRowCount () {
         return size(this.rows)
       },
-      cached_row_count () {
+      cachedRowCount () {
         return size(this.cachedRows)
       },
-      first_visible_row () {
+      firstVisibleRow () {
         return Math.floor(this.scrollTop / this.rowHeight)
       },
-      last_visible_row () {
+      lastVisibleRow () {
         return Math.min(Math.ceil((this.scrollTop + this.clientHeight) / this.rowHeight), this.totalRowCount)
       },
-      visible_row_count () {
-        return this.last_visible_row - this.first_visible_row
+      visibleRowCount () {
+        return this.lastVisibleRow - this.firstVisibleRow
       },
-      rows_in_cache () {
+      rowsInCache () {
         let missingRows = false
 
-        if (this.cached_row_count === 0) { return false }
+        if (this.cachedRowCount === 0) { return false }
 
         for (let i = this.start; i < this.start + this.limit; ++i) {
           if (i < this.totalRowCount && !this.cachedRows[i]) {
@@ -271,7 +269,7 @@
 
         return !missingRows
       },
-      render_rows () {
+      renderRows () {
         if (this.liveScroll) { return this.rows }
 
         let rows = []
@@ -280,12 +278,12 @@
         }
         return rows
       },
-      left_of_render_cols () {
+      leftOfRenderCols () {
         if (!this.virtualScroll) { return [] }
 
         // this value should be an empty array since we're showing
         // all columns when scrolling horizontally
-        if (this.is_potential_horizontal_scroll) { return [] }
+        if (this.isPotentialHorizontalScroll) { return [] }
 
         let left = (-1 * this.scrollLeft)
         return this.columns.filter(c => {
@@ -295,7 +293,7 @@
         })
       },
       leftOfRenderColsWidth () {
-        this.left_of_render_cols.map(c => c.pixelWidth + 1).reduce((sum, width) => sum + width, 0)
+        this.leftOfRenderCols.map(c => c.pixelWidth + 1).reduce((sum, width) => sum + width, 0)
       },
       renderCols () {
         if (!this.virtualScroll) { return this.columns }
@@ -303,15 +301,14 @@
         // horizontal scroll operations are far more performance with
         // all columns visible since this is a normal browser scroll event
         // and there are no expensive calculations that need to happen
-        if (this.is_potential_horizontal_scroll) { return this.columns }
+        if (this.isPotentialHorizontalScroll) { return this.columns }
 
         // if we haven't yet initialized our column widths,
         // we need to return all columns so that the cells
         // are rendered and the cell contents can be measured
-        if (!this.col_widths_initialized) { return this.columns }
+        if (!this.colWidthsInitialized) { return this.columns }
 
         let left = (-1 * this.scrollLeft)
-        // return _.filter(this.columns, (c) => {
         return this.columns.filter(c => {
           const isOffscreenLeft = left + c.pixelWidth + 1 < 0
           const isOffscreenRight = left > this.clientWidth
@@ -319,49 +316,45 @@
           return !isOffscreenLeft && !isOffscreenRight
         })
       },
-      first_visible_column () {
-        // return _.first(this.renderCols)
+      firstVisibleColumn () {
         return first(this.renderCols)
       },
-      last_visible_column () {
-        // return _.last(this.renderCols)
+      lastVisibleColumn () {
         return last(this.renderCols)
       },
-      visible_column_count () {
-        // return _.size(this.renderCols)
+      visibleColumnCount () {
         return size(this.renderCols)
       },
       totalColumnCount () {
-        // return _.size(this.columns)
         return size(this.columns)
       },
-      resize_delta () {
-        return this.mousedown_x === -1 ? 0 : this.mouseX - this.mousedown_x
+      resizeDelta () {
+        return this.mousedownX === -1 ? 0 : this.mouseX - this.mousedownX
       },
-      vertical_scrollbar_left () {
+      verticalScrollbarLeft () {
         return this.offsetLeft + this.clientWidth
       },
-      vertical_scrollbar_right () {
+      verticalScrollbarRight () {
         return this.offsetLeft + this.offsetWidth
       },
-      horizontal_scrollbar_top () {
+      horizontalScrollbarTop () {
         return this.offsetTop + this.clientHeight
       },
-      horizontal_scrollbar_bottom () {
+      horizontalScrollbarBottom () {
         return this.offsetTop + this.offsetHeight
       },
-      is_potential_horizontal_scroll () {
-        if (this.is_horizontal_scroll_active) { return true }
+      isPotentialHorizontalScroll () {
+        if (this.isHorizontalScrollActive) { return true }
 
         // handle bottom-right corner: if we're closer to the vertical
         // scrollbar than we are to the horizontal scrollbar, return 'false'
-        if (this.mouseX / this.vertical_scrollbar_left >
-            this.mouseY / this.horizontal_scrollbar_top) { return false }
+        if (this.mouseX / this.verticalScrollbarLeft >
+            this.mouseY / this.horizontalScrollbarTop) { return false }
 
         // for the rest of the viewport, return 'true' when we get close
         // to the horizontal scrollbar
-        if (this.mouseY >= this.horizontal_scrollbar_top * 2 / 3 &&
-            this.mouseY < this.horizontal_scrollbar_bottom) {
+        if (this.mouseY >= this.horizontalScrollbarTop * 2 / 3 &&
+            this.mouseY < this.horizontalScrollbarBottom) {
           return true
         }
 
@@ -400,14 +393,14 @@
       }
     },
     mounted () {
-      this.active_xhr = null
+      this.activeXhr = null
       this.cancelXhr = null
-      this.default_col_widths = {}
+      this.defaultColWidths = {}
 
       // initialize container offset
       const offset = getOffset(this.$refs['container'])
-      this.container_offset_top = offset.top
-      this.container_offset_left = offset.left
+      this.containerOffsetTop = offset.top
+      this.containerOffsetLeft = offset.left
 
       // initialize the client dimensions
       this.clientHeight = this.$el.clientHeight
@@ -427,17 +420,17 @@
 
       // document-level mouse down
       this.onDocumentMousedown = (evt) => {
-        this.mousedown_x = evt.pageX
-        this.mousedown_y = evt.pageY
+        this.mousedownX = evt.pageX
+        this.mousedownY = evt.pageY
       }
 
       // document-level mouse up
       this.onDocumentMouseup = (evt) => {
-        this.mousedown_x = -1
-        this.mousedown_y = -1
-        this.resize_col = null
-        this.resize_row_handle = null
-        this.is_horizontal_scroll_active = false
+        this.mousedownX = -1
+        this.mousedownY = -1
+        this.resizeCol = null
+        this.resizeRowHandle = null
+        this.isHorizontalScrollActive = false
         this.updateStyle('cursor', '')
         this.updateStyle('noselect', '')
       }
@@ -447,9 +440,9 @@
         this.mouseX = evt.pageX
         this.mouseY = evt.pageY
 
-        if (!isNil(this.resize_row_handle)) { this.resizeRowHandleThrottled() }
+        if (!isNil(this.resizeRowHandle)) { this.resizeRowHandleThrottled() }
 
-        if (!isNil(this.resize_col)) { this.resizeColumnThrottled() }
+        if (!isNil(this.resizeCol)) { this.resizeColumnThrottled() }
       }
 
       // create document-level event handlers
@@ -478,19 +471,19 @@
         const fetchUrl = this.getFetchUrl(fetchStart, fetchLimit)
 
         // if the last XHR is still active, kill it now
-        if (!isNil(this.active_xhr) && !isNil(this.cancelXhr)) {
+        if (!isNil(this.activeXhr) && !isNil(this.cancelXhr)) {
           this.cancelXhr()
 
           // reset XHR variables
-          this.active_xhr = null
+          this.activeXhr = null
           this.cancelXhr = null
         }
 
         // if all of the rows exist in our row cache, we're done
-        if (this.rows_in_cache) { return }
+        if (this.rowsInCache) { return }
 
         const CancelToken = axios.CancelToken
-        this.active_xhr = axios.get(fetchUrl, {
+        this.activeXhr = axios.get(fetchUrl, {
           headers: this.customHeaders,
           cancelToken: new CancelToken(function executor (c) {
             // an executor function receives a cancel function as a parameter
@@ -527,34 +520,33 @@
           }
 
           // add the temporary cached rows to our stored cached rows
-          const cacheRows = Object.assign(this.cached_rows, tempCachedRows)
+          const cacheRows = Object.assign(this.cachedRows, tempCachedRows)
           this.cachedRows = assign({}, cacheRows)
 
           // set our init flag to true so we don't get columns after this
           this.initialized = true
 
           // reset XHR variables
-          this.active_xhr = null
+          this.activeXhr = null
           this.cancelXhr = null
         })
       },
 
       onStartRowHandleResize (col) {
-        this.resize_row_handle = { old_width: this.rowHandleWidth }
+        this.resizeRowHandle = { oldWidth: this.rowHandleWidth }
         this.updateStyle('cursor', 'html, body { cursor: ew-resize !important; }')
         this.updateStyle('noselect', 'html, body { -moz-user-select: none !important; user-select: none !important }')
       },
 
       onStartColumnResize (col) {
-        this.resize_col = cloneDeep(col)
+        this.resizeCol = cloneDeep(col)
         this.updateStyle('cursor', 'html, body { cursor: ew-resize !important; }')
         this.updateStyle('noselect', 'html, body { -moz-user-select: none !important; user-select: none !important }')
       },
 
       onResize (resizeEl) {
-        // var container_el = this.$refs['container']
-        this.offsetTop = this.container_offset_top + resizeEl.offsetTop
-        this.offsetLeft = this.container_offset_left + resizeEl.offsetLeft
+        this.offsetTop = this.containerOffsetTop + resizeEl.offsetTop
+        this.offsetLeft = this.containerOffsetLeft + resizeEl.offsetLeft
         this.offsetHeight = resizeEl.offsetHeight
         this.offsetWidth = resizeEl.offsetWidth
         this.clientHeight = resizeEl.clientHeight
@@ -562,8 +554,8 @@
 
         this.$nextTick(() => {
           // check to see if all of the visible rows have been queried for
-          if (this.last_visible_row >= this.start + this.rendered_row_count) {
-            this.start = this.first_visible_row
+          if (this.lastVisibleRow >= this.start + this.renderedRowCount) {
+            this.start = this.firstVisibleRow
             this.tryFetchDebounced()
           }
         })
@@ -584,38 +576,38 @@
         this.scrollTop = val
 
         // scrolling down
-        if (this.last_visible_row >= this.start + this.rendered_row_count) {
-          this.start = this.first_visible_row
+        if (this.lastVisibleRow >= this.start + this.renderedRowCount) {
+          this.start = this.firstVisibleRow
           this.tryFetchDebounced()
         }
 
         // scrolling up
-        if (this.first_visible_row < this.start) {
-          this.start = this.first_visible_row
+        if (this.firstVisibleRow < this.start) {
+          this.start = this.firstVisibleRow
           this.tryFetchDebounced()
         }
       },
 
       scrollHorizontal (val, oldVal) {
-        this.is_horizontal_scroll_active = true
+        this.isHorizontalScrollActive = true
         this.scrollLeft = val
       },
 
       resizeRowHandle () {
-        const oldWidth = this.resize_row_handle.old_width
-        let newWidth = oldWidth + this.resize_delta
+        const oldWidth = this.resizeRowHandle.oldWidth
+        let newWidth = oldWidth + this.resizeDelta
         newWidth = Math.max(ROW_HANDLE_MIN_WIDTH, newWidth)
         newWidth = Math.min(ROW_HANDLE_MAX_WIDTH, newWidth)
         this.rowHandleWidth = newWidth
       },
 
       resizeColumn () {
-        var lookupCol = find(this.columns, { name: get(this.resize_col, 'name') })
+        var lookupCol = find(this.columns, { name: get(this.resizeCol, 'name') })
         if (!isNil(lookupCol)) {
           const tempCols = this.columns.map((col) => {
             if (get(col, 'name') === get(lookupCol, 'name')) {
-              const oldWidth = get(this.resize_col, 'pixelWidth', DEFAULT_COLUMN_WIDTH)
-              let pixelWidth = oldWidth + this.resize_delta
+              const oldWidth = get(this.resizeCol, 'pixelWidth', DEFAULT_COLUMN_WIDTH)
+              let pixelWidth = oldWidth + this.resizeDelta
               pixelWidth = Math.max(COLUMN_MIN_WIDTH, pixelWidth)
               pixelWidth = Math.min(COLUMN_MAX_WIDTH, pixelWidth)
               return assign({}, lookupCol, { pixelWidth })
@@ -630,24 +622,24 @@
 
       initializeColumnWidths (rowIndex, col, width) {
         // once we've initialized our column widths, we're done
-        if (this.col_widths_initialized) { return }
+        if (this.colWidthsInitialized) { return }
 
-        const minWidth = defaultTo(this.default_col_widths[col.name], COLUMN_MIN_WIDTH)
+        const minWidth = defaultTo(this.defaultColWidths[col.name], COLUMN_MIN_WIDTH)
         let newWidth = Math.max(minWidth, width + 20) // make columns a little wider than they need to be
         newWidth = Math.min(newWidth, COLUMN_MAX_WIDTH)
-        this.default_col_widths[col.name] = newWidth
+        this.defaultColWidths[col.name] = newWidth
 
         const isHeader = rowIndex === 'header'
-        const isLastRow = rowIndex === this.rendered_row_count - 1
+        const isLastRow = rowIndex === this.renderedRowCount - 1
 
         if (isHeader || isLastRow) {
           const tempCols = this.columns.map((col) => {
-            const pixelWidth = this.default_col_widths[col.name]
+            const pixelWidth = this.defaultColWidths[col.name]
             return assign({}, col, { pixelWidth })
           })
 
           this.columns = [...tempCols]
-          this.$nextTick(() => { this.col_widths_initialized = true })
+          this.$nextTick(() => { this.colWidthsInitialized = true })
         }
       },
 
