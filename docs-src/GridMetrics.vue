@@ -129,7 +129,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(v, k) in last_visible_column">
+                  <tr v-for="(v, k) in last_visible_column" :key="k" >
                     <td  class="pv1a ph1 ba b--light-moon-gray pr3 w1">{{k}}</td>
                     <td  class="pv1a ph1 ba b--light-moon-gray tr"><grid-metrics-value :val="v"></grid-metrics-value></td>
                   </tr>
@@ -144,7 +144,7 @@
 </template>
 
 <script>
-  import _ from 'lodash'
+  import get from 'lodash/get'
   import GridMetricsValue from './GridMetricsValue.vue'
 
   export default {
@@ -159,11 +159,11 @@
     },
     computed: {
       first_visible_column() {
-        var col = _.get(this.metrics, 'first_visible_column', {})
+        var col = get(this.metrics, 'first_visible_column', {})
         return col
       },
       last_visible_column() {
-        var col = _.get(this.metrics, 'last_visible_column', {})
+        var col = get(this.metrics, 'last_visible_column', {})
         return col
       }
     }

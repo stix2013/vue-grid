@@ -1,9 +1,11 @@
 # vue-grid
+
 > A flexible grid component for Vue.js
 
 vue-grid is designed to be an advanced [Vue.js](http://vuejs.org) grid component allowing for fast loading and rendering of tabular data.
 
 ## Documentation
+
 [https://github.com/dzwillia/vue-grid/](https://github.com/dzwillia/vue-grid/)
 
 ## Demo
@@ -11,9 +13,11 @@ vue-grid is designed to be an advanced [Vue.js](http://vuejs.org) grid component
 [https://dzwillia.github.io/vue-grid](https://dzwillia.github.io/vue-grid)
 
 ## Requirements
+
 * [Vue.js](http://vuejs.org/) (^v2.1.4)
 
 ## Browser support
+
 IE 10+ (due to [Flexbox support](https://caniuse.com/#feat=flexbox)).
 
 ## Installation
@@ -25,6 +29,7 @@ npm install vue-grid2 --save
 ```
 
 ### Usage
+
 > All styling for this component is done using [Tachyons.css](https://github.com/tachyons-css/tachyons/). No external CSS files are required at this time.
 
 ### ES6
@@ -66,6 +71,7 @@ Please note that for now the JSON payload must be formatted as follows:
 The `columns` node only needs to be provided on the first call.
 
 ## License
+
 vue-grid is open source and released under the [MIT License](LICENSE).
 
 Copyright (c) 2017 [David Z Williams](https://twitter.com/padredaveo).

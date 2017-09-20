@@ -3,6 +3,7 @@
     <grid-cell
       class="dib v-top overflow-hidden ba vg-td"
       v-for="(col, index) in columns"
+      :key="index"
       :col="col"
       :value="row[getColumnName(col)]"
       :width="col.pixel_width || 0"
@@ -16,7 +17,7 @@
   import {
     DEFAULT_ROW_HEIGHT
   } from '../constants'
-  import _ from 'lodash'
+  import get from 'lodash/get'
   import GridCell from './GridCell.vue'
 
   export default {
@@ -50,7 +51,7 @@
     },
     methods: {
       getColumnName(col) {
-        return _.get(col, 'name', '')
+        return get(col, 'name', '')
       },
       onCellDetermineWidth(col, width) {
         this.$emit('determine-cell-auto-width', this.rowIndex, col, width)

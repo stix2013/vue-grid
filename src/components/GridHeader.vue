@@ -3,6 +3,7 @@
     <grid-header-cell
       class="dib v-top overflow-hidden ba bg-near-white relative tc vg-th"
       v-for="(col, index) in columns"
+      :key="index"
       :col="col"
       :value="getColumnName(col)"
       :width="col.pixel_width || 0"
@@ -17,7 +18,7 @@
   import {
     DEFAULT_ROW_HEIGHT
   } from '../constants'
-  import _ from 'lodash'
+  import get from 'lodash/get'
   import GridHeaderCell from './GridHeaderCell.vue'
 
   export default {
@@ -36,7 +37,7 @@
     },
     methods: {
       getColumnName(col) {
-        return _.get(col, 'name', '')
+        return get(col, 'name', '')
       },
       onColumnResizerMousedown(col) {
         this.$emit('start-column-resize', col)

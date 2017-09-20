@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import _ from 'lodash'
+  import debounce from 'lodash/debounce'
 
   export default {
     props: {
@@ -23,7 +23,7 @@
       }
     },
     mounted() {
-      this.resetStyles = _.debounce(function() {
+      this.resetStyles = debounce(function() {
         this.cls = 'vg-metric-value-static'
       }, 100)
     }

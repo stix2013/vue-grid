@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import _ from 'lodash'
+  import assign from 'lodash/assign'
   import Grid from '../src/components/Grid.vue'
   import GridMetrics from './GridMetrics.vue'
   import GridEvents from './GridEvents.vue'
@@ -43,7 +43,7 @@
     },
     methods: {
       onGridMetricsChange(val, old_val) {
-        this.metrics = _.assign({}, val)
+        this.metrics = assign({}, val)
       },
       onGridOptionChange(option_name, val) {
         this.live_scroll = val
