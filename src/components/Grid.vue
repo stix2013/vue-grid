@@ -411,10 +411,10 @@
       // issues using debounce() and throttle() directly on the method
       this.tryFetchDebounced = debounce(this.tryFetch, 50, { leading: false, trailing: true })
       console.log('[COMP] Grid.vue::mounted resizeRowHandle', this.resizeRowHandle)
-      this.resizeRowHandleThrottled = throttle(this.resizeRowHandle, 20)
-      this.resizeColumnThrottled = throttle(this.resizeColumn, 20)
+      this.resizeRowHandleThrottled = throttle(this.resizeRowHandleFunc, 20)
+      this.resizeColumnThrottled = throttle(this.resizeColumnHandleFunc, 20)
       // this.scrollVerticalThrottled = debounce(this.scrollVertical, 5, { leading: false, trailing: true })
-      this.scrollVerticalThrottled = throttle(this.scrollVertical, 5, { leading: false, trailing: true })
+      this.scrollVerticalThrottled = throttle(this.scrollVerticalHandleFunc, 5, { leading: false, trailing: true })
 
       // do our initial fetch
       this.tryFetch()
@@ -573,7 +573,7 @@
         if (this.scrollLeft !== newScrollLeft) { return this.scrollHorizontal(newScrollLeft, this.scrollLeft) }
       },
 
-      scrollVertical (val, oldVal) {
+      scrollVerticalHandleFunc (val, oldVal) {
         this.scrollTop = val
 
         // scrolling down
@@ -594,7 +594,7 @@
         this.scrollLeft = val
       },
 
-      resizeRowHandle () {
+      resizeRowHandleFunc () {
         const oldWidth = this.resizeRowHandle.oldWidth
         let newWidth = oldWidth + this.resizeDelta
         newWidth = Math.max(ROW_HANDLE_MIN_WIDTH, newWidth)
@@ -602,7 +602,7 @@
         this.rowHandleWidth = newWidth
       },
 
-      resizeColumn () {
+      resizeColumnHandleFunc () {
         var lookupCol = find(this.columns, { name: get(this.resizeCol, 'name') })
         if (!isNil(lookupCol)) {
           const tempCols = this.columns.map((col) => {
