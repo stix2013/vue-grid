@@ -6,7 +6,7 @@
       :key="index"
       :col="col"
       :value="row[getColumnName(col)]"
-      :width="col.pixel_width || 0"
+      :width="col.pixelWidth || 0"
       :style="'height: '+(rowHeight+1)+'px'"
       @determine-auto-width="onCellDetermineWidth"
     ></grid-cell>

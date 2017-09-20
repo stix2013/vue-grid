@@ -6,7 +6,7 @@
       :key="index"
       :col="col"
       :value="getColumnName(col)"
-      :width="col.pixel_width || 0"
+      :width="col.pixelWidth || 0"
       :style="'height: '+(rowHeight+1)+'px'"
       @column-resizer-mousedown="onColumnResizerMousedown"
       @determine-auto-width="onHeaderCellDetermineWidth"

@@ -22,7 +22,7 @@
       },
       'row-handle-width': {
         type: Number,
-        default: DEFAULT_ROW_HEIGHT
+        default: DEFAULT_ROW_HANDLE_WIDTH
       }
     },
     computed: {

@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import VueGrid from './components/Grid.vue'
 
 // expose component to global scope
