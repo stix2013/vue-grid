@@ -13885,7 +13885,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 
-// import _ from 'lodash'
 
 
 
@@ -13932,23 +13931,23 @@ var getOffset = function getOffset(el) {
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: 'vue-grid',
   props: {
-    'data-url': {
+    dataUrl: {
       type: String,
       default: ''
     },
-    'custom-headers': {
+    customHeaders: {
       type: Object,
       default: function _default() {
         return {};
       }
     },
     /* show empty cells on vertical scroll */
-    'live-scroll': {
+    liveScroll: {
       type: Boolean,
       default: false
     },
     /* remove off-screen cells from the DOM on horizontal scroll */
-    'virtual-scroll': {
+    virtualScroll: {
       type: Boolean,
       default: true
     }
@@ -13973,52 +13972,53 @@ var getOffset = function getOffset(el) {
     totalHeight: function totalHeight(val, oldVal) {
       this.$emit('total-height-change', val, oldVal);
     },
-    rendered_row_count: function rendered_row_count(val, oldVal) {
+    renderedRowCount: function renderedRowCount(val, oldVal) {
       this.$emit('rendered-row-count-change', val, oldVal);
     },
-    cached_row_count: function cached_row_count(val, oldVal) {
+    cachedRowCount: function cachedRowCount(val, oldVal) {
       this.$emit('cached-row-count-change', val, oldVal);
     },
     totalRowCount: function totalRowCount(val, oldVal) {
       this.$emit('total-row-count-change', val, oldVal);
     },
-    first_visible_row: function first_visible_row(val, oldVal) {
+    firstVisibleRow: function firstVisibleRow(val, oldVal) {
       this.$emit('first-visible-row-change', val, oldVal);
     },
-    last_visible_row: function last_visible_row(val, oldVal) {
+    lastVisibleRow: function lastVisibleRow(val, oldVal) {
       this.$emit('last-visible-row-change', val, oldVal);
     },
-    visible_row_count: function visible_row_count(val, oldVal) {
+    visibleRowCount: function visibleRowCount(val, oldVal) {
       this.$emit('visible-row-count-change', val, oldVal);
-    },
-    first_visible_column: function first_visible_column(val, oldVal) {
-      this.$emit('first-visible-column-change', val, oldVal);
-    },
-    last_visible_column: function last_visible_column(val, oldVal) {
-      this.$emit('last-visible-column-change', val, oldVal);
-    },
-    visible_column_count: function visible_column_count(val, oldVal) {
-      this.$emit('visible-column-count-change', val, oldVal);
-    },
-    metrics: function metrics(val, oldVal) {
-      this.$emit('metrics-change', val, oldVal);
     }
+    // firstVisibleColumn (val, oldVal) {
+    //   console.log('firstVisibleColumn', val, oldVal)
+    //   this.$emit('first-visible-column-change', val, oldVal)
+    // },
+    // lastVisibleColumn (val, oldVal) {
+    //   this.$emit('last-visible-column-change', val, oldVal)
+    // },
+    // visibleColumnCount (val, oldVal) {
+    //   this.$emit('visible-column-count-change', val, oldVal)
+    // },
+    // metrics (val, oldVal) {
+    //   this.$emit('metrics-change', val, oldVal)
+    // }
+
   },
   data: function data() {
     return {
-      // uid: _.uniqueId('vue-grid-'),
       uid: __WEBPACK_IMPORTED_MODULE_3_lodash_uniqueId___default()('vue-grid-'),
 
       initialized: false,
-      col_widths_initialized: false,
+      colWidthsInitialized: false,
 
       start: __WEBPACK_IMPORTED_MODULE_2__constants__["h" /* DEFAULT_START */], // initial start
       limit: __WEBPACK_IMPORTED_MODULE_2__constants__["e" /* DEFAULT_LIMIT */], // initial limit
       totalRowCount: 0, // returned by query
 
       columns: [],
-      resize_col: null,
-      resize_row_handle: null,
+      resizeCol: null,
+      resizeRowHandle: null,
 
       rows: [],
       cachedRows: {},
@@ -14028,8 +14028,8 @@ var getOffset = function getOffset(el) {
       clientHeight: 0,
       clientWidth: 0,
 
-      container_offset_top: 0,
-      container_offset_left: 0,
+      containerOffsetTop: 0,
+      containerOffsetLeft: 0,
 
       offsetTop: 0,
       offsetLeft: 0,
@@ -14039,12 +14039,16 @@ var getOffset = function getOffset(el) {
       scrollTop: 0,
       scrollLeft: 0,
 
-      mousedown_x: -1,
-      mousedown_y: -1,
+      mousedownX: -1,
+      mousedownY: -1,
       mouseX: 0,
       mouseY: 0,
 
-      is_horizontal_scroll_active: false
+      isHorizontalScrollActive: false,
+      currentFirstColumn: null,
+      currentLastVisibleColumn: null,
+      visibleColumnCount: 0,
+      currentMetrics: {}
     };
   },
 
@@ -14053,31 +14057,29 @@ var getOffset = function getOffset(el) {
       return this.rowHeight * this.totalRowCount;
     },
     totalWidth: function totalWidth() {
-      return this.columns.map(function (column) {
-        return column.pixelWidth;
-      }).reduce(function (acc, width) {
-        return acc + width;
+      return this.columns.reduce(function (acc, column) {
+        return acc + column.pixelWidth;
       }, 0);
     },
-    rendered_row_count: function rendered_row_count() {
+    renderedRowCount: function renderedRowCount() {
       return __WEBPACK_IMPORTED_MODULE_4_lodash_size___default()(this.rows);
     },
-    cached_row_count: function cached_row_count() {
+    cachedRowCount: function cachedRowCount() {
       return __WEBPACK_IMPORTED_MODULE_4_lodash_size___default()(this.cachedRows);
     },
-    first_visible_row: function first_visible_row() {
+    firstVisibleRow: function firstVisibleRow() {
       return Math.floor(this.scrollTop / this.rowHeight);
     },
-    last_visible_row: function last_visible_row() {
+    lastVisibleRow: function lastVisibleRow() {
       return Math.min(Math.ceil((this.scrollTop + this.clientHeight) / this.rowHeight), this.totalRowCount);
     },
-    visible_row_count: function visible_row_count() {
-      return this.last_visible_row - this.first_visible_row;
+    visibleRowCount: function visibleRowCount() {
+      return this.lastVisibleRow - this.firstVisibleRow;
     },
-    rows_in_cache: function rows_in_cache() {
+    rowsInCache: function rowsInCache() {
       var missingRows = false;
 
-      if (this.cached_row_count === 0) {
+      if (this.cachedRowCount === 0) {
         return false;
       }
 
@@ -14090,7 +14092,7 @@ var getOffset = function getOffset(el) {
 
       return !missingRows;
     },
-    render_rows: function render_rows() {
+    renderRows: function renderRows() {
       if (this.liveScroll) {
         return this.rows;
       }
@@ -14103,14 +14105,14 @@ var getOffset = function getOffset(el) {
       }
       return rows;
     },
-    left_of_render_cols: function left_of_render_cols() {
+    leftOfRenderCols: function leftOfRenderCols() {
       if (!this.virtualScroll) {
         return [];
       }
 
       // this value should be an empty array since we're showing
       // all columns when scrolling horizontally
-      if (this.is_potential_horizontal_scroll) {
+      if (this.isPotentialHorizontalScroll) {
         return [];
       }
 
@@ -14122,10 +14124,9 @@ var getOffset = function getOffset(el) {
       });
     },
     leftOfRenderColsWidth: function leftOfRenderColsWidth() {
-      this.left_of_render_cols.map(function (c) {
-        return c.pixelWidth + 1;
-      }).reduce(function (sum, width) {
-        return sum + width;
+      console.log('leftOfRenderColsWidth', this.leftOfRenderCols);
+      this.leftOfRenderCols.reduce(function (sum, column) {
+        return sum + column.pixelWidth;
       }, 0);
     },
     renderCols: function renderCols() {
@@ -14138,19 +14139,18 @@ var getOffset = function getOffset(el) {
       // horizontal scroll operations are far more performance with
       // all columns visible since this is a normal browser scroll event
       // and there are no expensive calculations that need to happen
-      if (this.is_potential_horizontal_scroll) {
+      if (this.isPotentialHorizontalScroll) {
         return this.columns;
       }
 
       // if we haven't yet initialized our column widths,
       // we need to return all columns so that the cells
       // are rendered and the cell contents can be measured
-      if (!this.col_widths_initialized) {
+      if (!this.colWidthsInitialized) {
         return this.columns;
       }
 
       var left = -1 * this.scrollLeft;
-      // return _.filter(this.columns, (c) => {
       return this.columns.filter(function (c) {
         var isOffscreenLeft = left + c.pixelWidth + 1 < 0;
         var isOffscreenRight = left > _this.clientWidth;
@@ -14158,51 +14158,62 @@ var getOffset = function getOffset(el) {
         return !isOffscreenLeft && !isOffscreenRight;
       });
     },
-    first_visible_column: function first_visible_column() {
-      // return _.first(this.renderCols)
-      return __WEBPACK_IMPORTED_MODULE_5_lodash_first___default()(this.renderCols);
+    firstVisibleColumn: function firstVisibleColumn() {
+      // return first(this.renderCols)
+      if (!this.renderCols || !Array.isArray(this.renderCols)) {
+        return null;
+      }
+      var firstColumn = __WEBPACK_IMPORTED_MODULE_5_lodash_first___default()(this.renderCols);
+      this.$emit('first-visible-column-change', firstColumn, this.currentFirstColumn);
+      this.currentFirstColumn = firstColumn;
+      return firstColumn;
     },
-    last_visible_column: function last_visible_column() {
-      // return _.last(this.renderCols)
-      return __WEBPACK_IMPORTED_MODULE_6_lodash_last___default()(this.renderCols);
+    lastVisibleColumn: function lastVisibleColumn() {
+      // return last(this.renderCols)
+      var lastVisibleColumn = __WEBPACK_IMPORTED_MODULE_6_lodash_last___default()(this.renderCols);
+      this.$emit('last-visible-column-change', lastVisibleColumn, this.currentLastVisibleColumn);
+      this.currentLastVisibleColumn = lastVisibleColumn;
+      return lastVisibleColumn;
     },
-    visible_column_count: function visible_column_count() {
-      // return _.size(this.renderCols)
-      return __WEBPACK_IMPORTED_MODULE_4_lodash_size___default()(this.renderCols);
+    visibleColumnCount: function visibleColumnCount() {
+      // return size(this.renderCols)
+      var visibleColumnCount = __WEBPACK_IMPORTED_MODULE_4_lodash_size___default()(this.renderCols);
+      this.$emit('visible-column-count-change', visibleColumnCount, this.currentVisibleColumnCount);
+      this.currentVisibleColumnCount = visibleColumnCount;
+      return visibleColumnCount;
     },
     totalColumnCount: function totalColumnCount() {
-      // return _.size(this.columns)
       return __WEBPACK_IMPORTED_MODULE_4_lodash_size___default()(this.columns);
     },
-    resize_delta: function resize_delta() {
-      return this.mousedown_x === -1 ? 0 : this.mouseX - this.mousedown_x;
+    resizeDelta: function resizeDelta() {
+      return this.mousedownX === -1 ? 0 : this.mouseX - this.mousedownX;
     },
-    vertical_scrollbar_left: function vertical_scrollbar_left() {
+    verticalScrollbarLeft: function verticalScrollbarLeft() {
       return this.offsetLeft + this.clientWidth;
     },
-    vertical_scrollbar_right: function vertical_scrollbar_right() {
+    verticalScrollbarRight: function verticalScrollbarRight() {
       return this.offsetLeft + this.offsetWidth;
     },
-    horizontal_scrollbar_top: function horizontal_scrollbar_top() {
+    horizontalScrollbarTop: function horizontalScrollbarTop() {
       return this.offsetTop + this.clientHeight;
     },
-    horizontal_scrollbar_bottom: function horizontal_scrollbar_bottom() {
+    horizontalScrollbarBottom: function horizontalScrollbarBottom() {
       return this.offsetTop + this.offsetHeight;
     },
-    is_potential_horizontal_scroll: function is_potential_horizontal_scroll() {
-      if (this.is_horizontal_scroll_active) {
+    isPotentialHorizontalScroll: function isPotentialHorizontalScroll() {
+      if (this.isHorizontalScrollActive) {
         return true;
       }
 
       // handle bottom-right corner: if we're closer to the vertical
       // scrollbar than we are to the horizontal scrollbar, return 'false'
-      if (this.mouseX / this.vertical_scrollbar_left > this.mouseY / this.horizontal_scrollbar_top) {
+      if (this.mouseX / this.verticalScrollbarLeft > this.mouseY / this.horizontalScrollbarTop) {
         return false;
       }
 
       // for the rest of the viewport, return 'true' when we get close
       // to the horizontal scrollbar
-      if (this.mouseY >= this.horizontal_scrollbar_top * 2 / 3 && this.mouseY < this.horizontal_scrollbar_bottom) {
+      if (this.mouseY >= this.horizontalScrollbarTop * 2 / 3 && this.mouseY < this.horizontalScrollbarBottom) {
         return true;
       }
 
@@ -14218,21 +14229,23 @@ var getOffset = function getOffset(el) {
       });
 
       var filteredData = __WEBPACK_IMPORTED_MODULE_8_lodash_pick___default()(this.$data, ['start', 'limit', 'rows', 'totalRowCount', 'columns', 'totalColumnCount', 'cachedRows', 'rowHeight', 'rowHandleWidth', 'mouseX', 'mouseY', 'scrollTop', 'scrollLeft', 'offsetTop', 'offsetLeft', 'offsetHeight', 'offsetWidth', 'clientHeight', 'clientWidth', 'totalHeight', 'totalWidth']);
-
+      var metrics = __WEBPACK_IMPORTED_MODULE_10_lodash_assign___default()({}, filteredData, computedData);
+      this.$emit('metrics-change', metrics, this.currentMetrics);
+      this.currentMetrics = metrics;
       return __WEBPACK_IMPORTED_MODULE_10_lodash_assign___default()({}, filteredData, computedData);
     }
   },
   mounted: function mounted() {
     var _this3 = this;
 
-    this.active_xhr = null;
+    this.activeXhr = null;
     this.cancelXhr = null;
-    this.default_col_widths = {};
+    this.defaultColWidths = {};
 
     // initialize container offset
     var offset = getOffset(this.$refs['container']);
-    this.container_offset_top = offset.top;
-    this.container_offset_left = offset.left;
+    this.containerOffsetTop = offset.top;
+    this.containerOffsetLeft = offset.left;
 
     // initialize the client dimensions
     this.clientHeight = this.$el.clientHeight;
@@ -14242,27 +14255,28 @@ var getOffset = function getOffset(el) {
     // to be members of this component since we've run into reference
     // issues using debounce() and throttle() directly on the method
     this.tryFetchDebounced = __WEBPACK_IMPORTED_MODULE_11_lodash_debounce___default()(this.tryFetch, 50, { leading: false, trailing: true });
-    this.resizeRowHandleThrottled = __WEBPACK_IMPORTED_MODULE_12_lodash_throttle___default()(this.resizeRowHandle, 20);
-    this.resizeColumnThrottled = __WEBPACK_IMPORTED_MODULE_12_lodash_throttle___default()(this.resizeColumn, 20);
+    console.log('[COMP] Grid.vue::mounted resizeRowHandle', this.resizeRowHandle);
+    this.resizeRowHandleThrottled = __WEBPACK_IMPORTED_MODULE_12_lodash_throttle___default()(this.resizeRowHandleFunc, 20);
+    this.resizeColumnThrottled = __WEBPACK_IMPORTED_MODULE_12_lodash_throttle___default()(this.resizeColumnHandleFunc, 20);
     // this.scrollVerticalThrottled = debounce(this.scrollVertical, 5, { leading: false, trailing: true })
-    this.scrollVerticalThrottled = __WEBPACK_IMPORTED_MODULE_12_lodash_throttle___default()(this.scrollVertical, 5, { leading: false, trailing: true });
+    this.scrollVerticalThrottled = __WEBPACK_IMPORTED_MODULE_12_lodash_throttle___default()(this.scrollVerticalHandleFunc, 5, { leading: false, trailing: true });
 
     // do our initial fetch
     this.tryFetch();
 
     // document-level mouse down
     this.onDocumentMousedown = function (evt) {
-      _this3.mousedown_x = evt.pageX;
-      _this3.mousedown_y = evt.pageY;
+      _this3.mousedownX = evt.pageX;
+      _this3.mousedownY = evt.pageY;
     };
 
     // document-level mouse up
     this.onDocumentMouseup = function (evt) {
-      _this3.mousedown_x = -1;
-      _this3.mousedown_y = -1;
-      _this3.resize_col = null;
-      _this3.resize_row_handle = null;
-      _this3.is_horizontal_scroll_active = false;
+      _this3.mousedownX = -1;
+      _this3.mousedownY = -1;
+      _this3.resizeCol = null;
+      _this3.resizeRowHandle = null;
+      _this3.isHorizontalScrollActive = false;
       _this3.updateStyle('cursor', '');
       _this3.updateStyle('noselect', '');
     };
@@ -14272,11 +14286,11 @@ var getOffset = function getOffset(el) {
       _this3.mouseX = evt.pageX;
       _this3.mouseY = evt.pageY;
 
-      if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(_this3.resize_row_handle)) {
+      if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(_this3.resizeRowHandle)) {
         _this3.resizeRowHandleThrottled();
       }
 
-      if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(_this3.resize_col)) {
+      if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(_this3.resizeCol)) {
         _this3.resizeColumnThrottled();
       }
     };
@@ -14310,21 +14324,21 @@ var getOffset = function getOffset(el) {
       var fetchUrl = this.getFetchUrl(fetchStart, fetchLimit);
 
       // if the last XHR is still active, kill it now
-      if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(this.active_xhr) && !__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(this.cancelXhr)) {
+      if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(this.activeXhr) && !__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(this.cancelXhr)) {
         this.cancelXhr();
 
         // reset XHR variables
-        this.active_xhr = null;
+        this.activeXhr = null;
         this.cancelXhr = null;
       }
 
       // if all of the rows exist in our row cache, we're done
-      if (this.rows_in_cache) {
+      if (this.rowsInCache) {
         return;
       }
 
       var CancelToken = __WEBPACK_IMPORTED_MODULE_21_axios___default.a.CancelToken;
-      this.active_xhr = __WEBPACK_IMPORTED_MODULE_21_axios___default.a.get(fetchUrl, {
+      this.activeXhr = __WEBPACK_IMPORTED_MODULE_21_axios___default.a.get(fetchUrl, {
         headers: this.customHeaders,
         cancelToken: new CancelToken(function executor(c) {
           // an executor function receives a cancel function as a parameter
@@ -14363,33 +14377,32 @@ var getOffset = function getOffset(el) {
         }
 
         // add the temporary cached rows to our stored cached rows
-        var cacheRows = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_assign___default()(_this4.cached_rows, tempCachedRows);
+        var cacheRows = __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_assign___default()(_this4.cachedRows, tempCachedRows);
         _this4.cachedRows = __WEBPACK_IMPORTED_MODULE_10_lodash_assign___default()({}, cacheRows);
 
         // set our init flag to true so we don't get columns after this
         _this4.initialized = true;
 
         // reset XHR variables
-        _this4.active_xhr = null;
+        _this4.activeXhr = null;
         _this4.cancelXhr = null;
       });
     },
     onStartRowHandleResize: function onStartRowHandleResize(col) {
-      this.resize_row_handle = { old_width: this.rowHandleWidth };
+      this.resizeRowHandle = { oldWidth: this.rowHandleWidth };
       this.updateStyle('cursor', 'html, body { cursor: ew-resize !important; }');
       this.updateStyle('noselect', 'html, body { -moz-user-select: none !important; user-select: none !important }');
     },
     onStartColumnResize: function onStartColumnResize(col) {
-      this.resize_col = __WEBPACK_IMPORTED_MODULE_17_lodash_cloneDeep___default()(col);
+      this.resizeCol = __WEBPACK_IMPORTED_MODULE_17_lodash_cloneDeep___default()(col);
       this.updateStyle('cursor', 'html, body { cursor: ew-resize !important; }');
       this.updateStyle('noselect', 'html, body { -moz-user-select: none !important; user-select: none !important }');
     },
     onResize: function onResize(resizeEl) {
       var _this5 = this;
 
-      // var container_el = this.$refs['container']
-      this.offsetTop = this.container_offset_top + resizeEl.offsetTop;
-      this.offsetLeft = this.container_offset_left + resizeEl.offsetLeft;
+      this.offsetTop = this.containerOffsetTop + resizeEl.offsetTop;
+      this.offsetLeft = this.containerOffsetLeft + resizeEl.offsetLeft;
       this.offsetHeight = resizeEl.offsetHeight;
       this.offsetWidth = resizeEl.offsetWidth;
       this.clientHeight = resizeEl.clientHeight;
@@ -14397,8 +14410,8 @@ var getOffset = function getOffset(el) {
 
       this.$nextTick(function () {
         // check to see if all of the visible rows have been queried for
-        if (_this5.last_visible_row >= _this5.start + _this5.rendered_row_count) {
-          _this5.start = _this5.first_visible_row;
+        if (_this5.lastVisibleRow >= _this5.start + _this5.renderedRowCount) {
+          _this5.start = _this5.firstVisibleRow;
           _this5.tryFetchDebounced();
         }
       });
@@ -14417,41 +14430,41 @@ var getOffset = function getOffset(el) {
         return this.scrollHorizontal(newScrollLeft, this.scrollLeft);
       }
     },
-    scrollVertical: function scrollVertical(val, oldVal) {
+    scrollVerticalHandleFunc: function scrollVerticalHandleFunc(val, oldVal) {
       this.scrollTop = val;
 
       // scrolling down
-      if (this.last_visible_row >= this.start + this.rendered_row_count) {
-        this.start = this.first_visible_row;
+      if (this.lastVisibleRow >= this.start + this.renderedRowCount) {
+        this.start = this.firstVisibleRow;
         this.tryFetchDebounced();
       }
 
       // scrolling up
-      if (this.first_visible_row < this.start) {
-        this.start = this.first_visible_row;
+      if (this.firstVisibleRow < this.start) {
+        this.start = this.firstVisibleRow;
         this.tryFetchDebounced();
       }
     },
     scrollHorizontal: function scrollHorizontal(val, oldVal) {
-      this.is_horizontal_scroll_active = true;
+      this.isHorizontalScrollActive = true;
       this.scrollLeft = val;
     },
-    resizeRowHandle: function resizeRowHandle() {
-      var oldWidth = this.resize_row_handle.old_width;
-      var newWidth = oldWidth + this.resize_delta;
+    resizeRowHandleFunc: function resizeRowHandleFunc() {
+      var oldWidth = this.resizeRowHandle.oldWidth;
+      var newWidth = oldWidth + this.resizeDelta;
       newWidth = Math.max(__WEBPACK_IMPORTED_MODULE_2__constants__["j" /* ROW_HANDLE_MIN_WIDTH */], newWidth);
       newWidth = Math.min(__WEBPACK_IMPORTED_MODULE_2__constants__["i" /* ROW_HANDLE_MAX_WIDTH */], newWidth);
       this.rowHandleWidth = newWidth;
     },
-    resizeColumn: function resizeColumn() {
+    resizeColumnHandleFunc: function resizeColumnHandleFunc() {
       var _this6 = this;
 
-      var lookupCol = __WEBPACK_IMPORTED_MODULE_18_lodash_find___default()(this.columns, { name: __WEBPACK_IMPORTED_MODULE_19_lodash_get___default()(this.resize_col, 'name') });
+      var lookupCol = __WEBPACK_IMPORTED_MODULE_18_lodash_find___default()(this.columns, { name: __WEBPACK_IMPORTED_MODULE_19_lodash_get___default()(this.resizeCol, 'name') });
       if (!__WEBPACK_IMPORTED_MODULE_13_lodash_isNil___default()(lookupCol)) {
         var tempCols = this.columns.map(function (col) {
           if (__WEBPACK_IMPORTED_MODULE_19_lodash_get___default()(col, 'name') === __WEBPACK_IMPORTED_MODULE_19_lodash_get___default()(lookupCol, 'name')) {
-            var oldWidth = __WEBPACK_IMPORTED_MODULE_19_lodash_get___default()(_this6.resize_col, 'pixelWidth', __WEBPACK_IMPORTED_MODULE_2__constants__["d" /* DEFAULT_COLUMN_WIDTH */]);
-            var pixelWidth = oldWidth + _this6.resize_delta;
+            var oldWidth = __WEBPACK_IMPORTED_MODULE_19_lodash_get___default()(_this6.resizeCol, 'pixelWidth', __WEBPACK_IMPORTED_MODULE_2__constants__["d" /* DEFAULT_COLUMN_WIDTH */]);
+            var pixelWidth = oldWidth + _this6.resizeDelta;
             pixelWidth = Math.max(__WEBPACK_IMPORTED_MODULE_2__constants__["b" /* COLUMN_MIN_WIDTH */], pixelWidth);
             pixelWidth = Math.min(__WEBPACK_IMPORTED_MODULE_2__constants__["a" /* COLUMN_MAX_WIDTH */], pixelWidth);
             return __WEBPACK_IMPORTED_MODULE_10_lodash_assign___default()({}, lookupCol, { pixelWidth: pixelWidth });
@@ -14467,27 +14480,27 @@ var getOffset = function getOffset(el) {
       var _this7 = this;
 
       // once we've initialized our column widths, we're done
-      if (this.col_widths_initialized) {
+      if (this.colWidthsInitialized) {
         return;
       }
 
-      var minWidth = __WEBPACK_IMPORTED_MODULE_20_lodash_defaultTo___default()(this.default_col_widths[col.name], __WEBPACK_IMPORTED_MODULE_2__constants__["b" /* COLUMN_MIN_WIDTH */]);
+      var minWidth = __WEBPACK_IMPORTED_MODULE_20_lodash_defaultTo___default()(this.defaultColWidths[col.name], __WEBPACK_IMPORTED_MODULE_2__constants__["b" /* COLUMN_MIN_WIDTH */]);
       var newWidth = Math.max(minWidth, width + 20); // make columns a little wider than they need to be
       newWidth = Math.min(newWidth, __WEBPACK_IMPORTED_MODULE_2__constants__["a" /* COLUMN_MAX_WIDTH */]);
-      this.default_col_widths[col.name] = newWidth;
+      this.defaultColWidths[col.name] = newWidth;
 
       var isHeader = rowIndex === 'header';
-      var isLastRow = rowIndex === this.rendered_row_count - 1;
+      var isLastRow = rowIndex === this.renderedRowCount - 1;
 
       if (isHeader || isLastRow) {
         var tempCols = this.columns.map(function (col) {
-          var pixelWidth = _this7.default_col_widths[col.name];
+          var pixelWidth = _this7.defaultColWidths[col.name];
           return __WEBPACK_IMPORTED_MODULE_10_lodash_assign___default()({}, col, { pixelWidth: pixelWidth });
         });
 
         this.columns = [].concat(__WEBPACK_IMPORTED_MODULE_1_babel_runtime_helpers_toConsumableArray___default()(tempCols));
         this.$nextTick(function () {
-          _this7.col_widths_initialized = true;
+          _this7.colWidthsInitialized = true;
         });
       }
     },
@@ -22891,28 +22904,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    'row-height': {
+    rowHeight: {
       type: Number,
       default: __WEBPACK_IMPORTED_MODULE_0__constants__["g" /* DEFAULT_ROW_HEIGHT */]
     },
-    'row-handle-width': {
+    rowHandleWidth: {
       type: Number,
-      default: __WEBPACK_IMPORTED_MODULE_0__constants__["f" /* DEFAULT_ROW_HANDLE_WIDTH */]
+      // default: DEFAULT_ROW_HANDLE_WIDTH
+      default: __WEBPACK_IMPORTED_MODULE_0__constants__["g" /* DEFAULT_ROW_HEIGHT */]
     }
   },
   data: function data() {
     return {
-      column_resize_handle_width: __WEBPACK_IMPORTED_MODULE_0__constants__["c" /* COLUMN_RESIZE_HANDLE_WIDTH */]
+      columnResizeHandleWidth: __WEBPACK_IMPORTED_MODULE_0__constants__["c" /* COLUMN_RESIZE_HANDLE_WIDTH */]
     };
   },
 
   computed: {
-    row_handle_style: function row_handle_style() {
+    rowHandleStyle: function rowHandleStyle() {
       return {
         'height': this.rowHeight + 1 + 'px'
       };
     },
-    inner_row_handle_style: function inner_row_handle_style() {
+    innerRowHandleStyle: function innerRowHandleStyle() {
       return {
         'width': this.rowHandleWidth + 'px'
       };
@@ -22932,13 +22946,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "overflow-hidden ba absolute bg-near-white z-1 vg-th",
-    style: (_vm.row_handle_style)
+    style: (_vm.rowHandleStyle)
   }, [_c('div', {
     staticClass: "h-100 lh-1 light-silver tr vg-th-inner",
-    style: (_vm.inner_row_handle_style)
+    style: (_vm.innerRowHandleStyle)
   }), _vm._v(" "), _c('div', {
     staticClass: "absolute top-0 bottom-0 right-0 cursor-resize-ew",
-    style: ('width: ' + _vm.column_resize_handle_width + 'px'),
+    style: ('width: ' + _vm.columnResizeHandleWidth + 'px'),
     on: {
       "mousedown": _vm.onRowHandleResizerMousedown
     }
@@ -22997,11 +23011,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    'row-height': {
+    rowHeight: {
       type: Number,
       default: __WEBPACK_IMPORTED_MODULE_0__constants__["g" /* DEFAULT_ROW_HEIGHT */]
     },
-    'columns': {
+    columns: {
       type: Array,
       required: true
     }
@@ -23068,28 +23082,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    'col': {
+    col: {
       type: Object,
       required: true
     },
-    'value': {
+    value: {
       required: true
     },
-    'width': {
+    width: {
       type: Number,
       required: true
     }
   },
   data: function data() {
     return {
-      content_width: 0,
-      column_resize_handle_width: __WEBPACK_IMPORTED_MODULE_0__constants__["c" /* COLUMN_RESIZE_HANDLE_WIDTH */]
+      contentWidth: 0,
+      columnResizeHandleWidth: __WEBPACK_IMPORTED_MODULE_0__constants__["c" /* COLUMN_RESIZE_HANDLE_WIDTH */]
     };
   },
   mounted: function mounted() {
     var el = this.$refs.content;
-    this.content_width = el ? el.offsetWidth : 0;
-    this.$emit('determine-auto-width', this.col, this.content_width);
+    this.contentWidth = el ? el.offsetWidth : 0;
+    this.$emit('determine-auto-width', this.col, this.contentWidth);
   },
 
   methods: {
@@ -23111,7 +23125,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     ref: "content"
   }, [_vm._v(_vm._s(_vm.value))])]), _vm._v(" "), _c('div', {
     staticClass: "absolute top-0 bottom-0 right-0 cursor-resize-ew",
-    style: ('width: ' + _vm.column_resize_handle_width + 'px'),
+    style: ('width: ' + _vm.columnResizeHandleWidth + 'px'),
     on: {
       "mousedown": _vm.onColumnResizerMousedown
     }
@@ -23179,27 +23193,27 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    'row-index': {
+    rowIndex: {
       type: Number,
       required: true
     },
-    'row-height': {
+    rowHeight: {
       type: Number,
       default: __WEBPACK_IMPORTED_MODULE_0__constants__["g" /* DEFAULT_ROW_HEIGHT */]
     },
-    'row-handle-width': {
+    rowHandleWidth: {
       type: Number,
       default: __WEBPACK_IMPORTED_MODULE_0__constants__["f" /* DEFAULT_ROW_HANDLE_WIDTH */]
     }
   },
   computed: {
-    row_style: function row_style() {
+    rowStyle: function rowStyle() {
       return {
         'top': this.rowIndex * this.rowHeight + 'px',
         'height': this.rowHeight + 1 + 'px'
       };
     },
-    inner_row_handle_style: function inner_row_handle_style() {
+    innerRowHandleStyle: function innerRowHandleStyle() {
       return {
         'width': this.rowHandleWidth + 'px'
       };
@@ -23214,10 +23228,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "absolute nowrap",
-    style: (_vm.row_style)
+    style: (_vm.rowStyle)
   }, [_c('div', {
     staticClass: "h-100 lh-1 light-silver tr vg-td-inner",
-    style: (_vm.inner_row_handle_style)
+    style: (_vm.innerRowHandleStyle)
   }, [_vm._v(_vm._s(_vm.rowIndex + 1))])])
 },staticRenderFns: []}
 
@@ -23272,19 +23286,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    'row': {
+    row: {
       type: Object,
       required: true
     },
-    'row-index': {
+    rowIndex: {
       type: Number,
       required: true
     },
-    'row-height': {
+    rowHeight: {
       type: Number,
       default: __WEBPACK_IMPORTED_MODULE_0__constants__["g" /* DEFAULT_ROW_HEIGHT */]
     },
-    'columns': {
+    columns: {
       type: Array,
       required: true
     }
@@ -23293,7 +23307,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     GridCell: __WEBPACK_IMPORTED_MODULE_2__GridCell_vue___default.a
   },
   computed: {
-    row_style: function row_style() {
+    rowStyle: function rowStyle() {
       return {
         'top': this.rowIndex * this.rowHeight + 'px'
       };
@@ -23347,21 +23361,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    'col': {
+    col: {
       type: Object,
       required: true
     },
-    'value': {
+    value: {
       required: true
     },
-    'width': {
+    width: {
       type: Number,
       required: true
     }
   },
   data: function data() {
     return {
-      content_width: 0
+      contentWidth: 0
     };
   },
 
@@ -23385,8 +23399,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
   mounted: function mounted() {
     var el = this.$refs.content;
-    this.content_width = el ? el.offsetWidth : 0;
-    this.$emit('determine-auto-width', this.col, this.content_width);
+    this.contentWidth = el ? el.offsetWidth : 0;
+    this.$emit('determine-auto-width', this.col, this.contentWidth);
   }
 });
 
@@ -23411,7 +23425,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "absolute nowrap",
-    style: (_vm.row_style)
+    style: (_vm.rowStyle)
   }, _vm._l((_vm.columns), function(col, index) {
     return _c('grid-cell', {
       key: index,
@@ -24201,7 +24215,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "absolute z-1",
     style: ('top: ' + (_vm.rowHeight - _vm.scrollTop) + 'px')
-  }, _vm._l((_vm.render_rows), function(row, index) {
+  }, _vm._l((_vm.renderRows), function(row, index) {
     return _c('grid-row-handle', {
       key: index,
       staticClass: "ba bg-near-white vg-td",
@@ -24230,7 +24244,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }), _vm._v(" "), _c('div', {
     staticClass: "absolute top-0 left-0",
     style: ('z-index: -1; height: 1px; width: ' + _vm.totalWidth + 'px')
-  }), _vm._v(" "), _vm._l((_vm.render_rows), function(row, index) {
+  }), _vm._v(" "), _vm._l((_vm.renderRows), function(row, index) {
     return _c('grid-row', {
       key: index,
       style: ('padding-left: ' + _vm.leftOfRenderColsWidth + 'px'),

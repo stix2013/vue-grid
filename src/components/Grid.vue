@@ -177,20 +177,20 @@
       },
       visibleRowCount (val, oldVal) {
         this.$emit('visible-row-count-change', val, oldVal)
-      },
-      firstVisibleColumn (val, oldVal) {
-        console.log('firstVisibleColumn', val, oldVal)
-        this.$emit('first-visible-column-change', val, oldVal)
-      },
-      lastVisibleColumn (val, oldVal) {
-        this.$emit('last-visible-column-change', val, oldVal)
-      },
-      visibleColumnCount (val, oldVal) {
-        this.$emit('visible-column-count-change', val, oldVal)
-      },
-      metrics (val, oldVal) {
-        this.$emit('metrics-change', val, oldVal)
       }
+      // firstVisibleColumn (val, oldVal) {
+      //   console.log('firstVisibleColumn', val, oldVal)
+      //   this.$emit('first-visible-column-change', val, oldVal)
+      // },
+      // lastVisibleColumn (val, oldVal) {
+      //   this.$emit('last-visible-column-change', val, oldVal)
+      // },
+      // visibleColumnCount (val, oldVal) {
+      //   this.$emit('visible-column-count-change', val, oldVal)
+      // },
+      // metrics (val, oldVal) {
+      //   this.$emit('metrics-change', val, oldVal)
+      // }
     },
     data () {
       return {
@@ -231,7 +231,11 @@
         mouseX: 0,
         mouseY: 0,
 
-        isHorizontalScrollActive: false
+        isHorizontalScrollActive: false,
+        currentFirstColumn: null,
+        currentLastVisibleColumn: null,
+        visibleColumnCount: 0,
+        currentMetrics: {}
       }
     },
     computed: {
@@ -319,13 +323,28 @@
         })
       },
       firstVisibleColumn () {
-        return first(this.renderCols)
+        // return first(this.renderCols)
+        if (!this.renderCols || !Array.isArray(this.renderCols)) {
+          return null
+        }
+        const firstColumn = first(this.renderCols)
+        this.$emit('first-visible-column-change', firstColumn, this.currentFirstColumn)
+        this.currentFirstColumn = firstColumn
+        return firstColumn
       },
       lastVisibleColumn () {
-        return last(this.renderCols)
+        // return last(this.renderCols)
+        const lastVisibleColumn = last(this.renderCols)
+        this.$emit('last-visible-column-change', lastVisibleColumn, this.currentLastVisibleColumn)
+        this.currentLastVisibleColumn = lastVisibleColumn
+        return lastVisibleColumn
       },
       visibleColumnCount () {
-        return size(this.renderCols)
+        // return size(this.renderCols)
+        const visibleColumnCount = size(this.renderCols)
+        this.$emit('visible-column-count-change', visibleColumnCount, this.currentVisibleColumnCount)
+        this.currentVisibleColumnCount = visibleColumnCount
+        return visibleColumnCount
       },
       totalColumnCount () {
         return size(this.columns)
@@ -390,7 +409,9 @@
           'totalHeight',
           'totalWidth'
         ])
-
+        const metrics = assign({}, filteredData, computedData)
+        this.$emit('metrics-change', metrics, this.currentMetrics)
+        this.currentMetrics = metrics
         return assign({}, filteredData, computedData)
       }
     },
