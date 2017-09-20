@@ -410,6 +410,7 @@
       // to be members of this component since we've run into reference
       // issues using debounce() and throttle() directly on the method
       this.tryFetchDebounced = debounce(this.tryFetch, 50, { leading: false, trailing: true })
+      console.log('[COMP] Grid.vue::mounted resizeRowHandle', this.resizeRowHandle)
       this.resizeRowHandleThrottled = throttle(this.resizeRowHandle, 20)
       this.resizeColumnThrottled = throttle(this.resizeColumn, 20)
       // this.scrollVerticalThrottled = debounce(this.scrollVertical, 5, { leading: false, trailing: true })
