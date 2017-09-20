@@ -14,19 +14,20 @@
 <script>
   import {
     DEFAULT_ROW_HEIGHT,
-    DEFAULT_ROW_HANDLE_WIDTH,
+    // DEFAULT_ROW_HANDLE_WIDTH,
     COLUMN_RESIZE_HANDLE_WIDTH
   } from '../constants'
 
   export default {
     props: {
-      'row-height': {
+      rowHeight: {
         type: Number,
         default: DEFAULT_ROW_HEIGHT
       },
-      'row-handle-width': {
+      rowHandleWidth: {
         type: Number,
-        default: DEFAULT_ROW_HANDLE_WIDTH
+        // default: DEFAULT_ROW_HANDLE_WIDTH
+        default: DEFAULT_ROW_HEIGHT
       }
     },
     data () {

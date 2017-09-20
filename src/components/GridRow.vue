@@ -22,19 +22,19 @@
 
   export default {
     props: {
-      'row': {
+      row: {
         type: Object,
         required: true
       },
-      'row-index': {
+      rowIndex: {
         type: Number,
         required: true
       },
-      'row-height': {
+      rowHeight: {
         type: Number,
         default: DEFAULT_ROW_HEIGHT
       },
-      'columns': {
+      columns: {
         type: Array,
         required: true
       }

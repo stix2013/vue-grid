@@ -21,14 +21,14 @@
 
   export default {
     props: {
-      'col': {
+      col: {
         type: Object,
         required: true
       },
-      'value': {
+      value: {
         required: true
       },
-      'width': {
+      width: {
         type: Number,
         required: true
       }

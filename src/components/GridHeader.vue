@@ -23,11 +23,11 @@
 
   export default {
     props: {
-      'row-height': {
+      rowHeight: {
         type: Number,
         default: DEFAULT_ROW_HEIGHT
       },
-      'columns': {
+      columns: {
         type: Array,
         required: true
       }

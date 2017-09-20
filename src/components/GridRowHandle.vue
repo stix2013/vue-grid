@@ -12,15 +12,15 @@
 
   export default {
     props: {
-      'row-index': {
+      rowIndex: {
         type: Number,
         required: true
       },
-      'row-height': {
+      rowHeight: {
         type: Number,
         default: DEFAULT_ROW_HEIGHT
       },
-      'row-handle-width': {
+      rowHandleWidth: {
         type: Number,
         default: DEFAULT_ROW_HANDLE_WIDTH
       }

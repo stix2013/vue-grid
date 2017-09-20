@@ -179,6 +179,7 @@
         this.$emit('visible-row-count-change', val, oldVal)
       },
       firstVisibleColumn (val, oldVal) {
+        console.log('firstVisibleColumn', val, oldVal)
         this.$emit('first-visible-column-change', val, oldVal)
       },
       lastVisibleColumn (val, oldVal) {
@@ -238,7 +239,7 @@
         return this.rowHeight * this.totalRowCount
       },
       totalWidth () {
-        return this.columns.map(column => column.pixelWidth).reduce((acc, width) => acc + width, 0)
+        return this.columns.reduce((acc, column) => acc + column.pixelWidth, 0)
       },
       renderedRowCount () {
         return size(this.rows)
@@ -293,7 +294,8 @@
         })
       },
       leftOfRenderColsWidth () {
-        this.leftOfRenderCols.map(c => c.pixelWidth + 1).reduce((sum, width) => sum + width, 0)
+        console.log('leftOfRenderColsWidth', this.leftOfRenderCols)
+        this.leftOfRenderCols.reduce((sum, column) => sum + column.pixelWidth, 0)
       },
       renderCols () {
         if (!this.virtualScroll) { return this.columns }
